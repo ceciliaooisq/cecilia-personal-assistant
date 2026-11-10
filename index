@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cecilia • Personal Dashboard</title>
+  <style>
+    :root {
+      --bg: #faf8f6;
+      --card: #ffffff;
+      --text: #2c2c2c;
+      --muted: #7a7a7a;
+      --accent: #c9a89a;
+      --accent-soft: #f3ebe6;
+      --border: #eee7e2;
+      --green: #7a9e8e;
+      --red: #c97b7b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; }
+    header .date { color: var(--muted); font-size: 0.9rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .card.full { grid-column: 1 / -1; }
+    .card h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h2 span {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    ul { list-style: none; }
+    li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    li:last-child { border-bottom: none; }
+    .idea {
+      background: var(--accent-soft);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+    .idea-num { font-size: 0.75rem; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; }
+    .links a {
+      background: var(--accent-soft);
+      color: var(--text);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    .links a:hover { background: var(--accent); color: white; }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin-top: 8px;
+      font-family: inherit;
+    }
+    button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      margin-left: 8px;
+    }
+    .note { font-size: 0.8rem; color: var(--muted); margin-top: 8px; }
+    .pipeline-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.93rem;
+    }
+    .pipeline-item:last-child { border-bottom: none; }
+    .status {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .market-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+    }
+    .market-row:last-child { border-bottom: none; }
+    .up { color: var(--green); font-weight: 500; }
+    .down { color: var(--red); font-weight: 500; }
+    .market-note { font-size: 0.8rem; color: var(--muted); margin-top: 12px; line-height: 1.4; }
+    .section-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin: 12px 0 6px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cecilia • Dashboard</h1>
+    <div class="date" id="todayDate"></div>
+  </header>
+
+  <div class="grid">
+
+    <!-- Social Plans -->
+    <div class="card">
+      <h2>Social Plans <span>editable</span></h2>
+      <ul id="socialList"></ul>
+      <div class="add-form">
+        <input type="text" id="planInput" placeholder="Add plan (e.g. Dinner with BF • Fri 8pm)">
+        <button onclick="addPlan()">Add</button>
+        <button class="secondary" onclick="downloadICS()">Add to iPhone Calendar</button>
+      </div>
+      <p class="note">Plans save in your browser. Tap “Add to iPhone Calendar” to download a .ics file — open it on your phone and it will offer to add the events.</p>
+    </div>
+
+    <!-- Watchlist -->
+    <div class="card">
+      <h2>Your Watchlist <span>US + MY</span></h2>
+      
+      <div class="section-label">US</div>
+      <div class="market-row"><span>VOO</span><span class="down">~690  −0.2%</span></div>
+      <div class="market-row"><span>MP Materials</span><span class="down">~36.7  −2.7%</span></div>
+      <div class="market-row"><span>Shopify (SHOP)</span><span class="down">~150  −1.2%</span></div>
+      <div class="market-row"><span>NVIDIA (NVDA)</span><span class="down">~172  −4%</span></div>
+
+      <div class="section-label">Malaysia</div>
+      <div class="market-row"><span>Public Bank</span><span class="down">4.68  −0.77%</span></div>
+      <div class="market-row"><span>Maybank</span><span class="down">10.06  −0.6%</span></div>
+      <div class="market-row"><span>RHB Bank</span><span>~7.7</span></div>
+      <div class="market-row"><span>Sunway</span><span>~5.4–5.5 range</span></div>
+
+      <p class="market-note">
+        Snapshot as of 10 Nov 2026 evening MYT. US softer after CPI; local banks under pressure.<br>
+        Say “refresh watchlist” anytime for updated numbers + short context.
+      </p>
+    </div>
+
+    <!-- On-screen texts -->
+    <div class="card full">
+      <h2>On-screen texts for b-roll / trial reels <span>10 soft + intelligent</span></h2>
+      <p class="note" style="margin-bottom: 14px;">Feminine energy • relationship wisdom • intelligent founder</p>
+
+      <div class="idea"><div class="idea-num">01</div>Soft power is still power. You don’t have to raise your voice to be heard.</div>
+      <div class="idea"><div class="idea-num">02</div>The right person doesn’t complete you. They make it safer to be fully yourself.</div>
+      <div class="idea"><div class="idea-num">03</div>I built a company and I’m still learning how to rest without guilt.</div>
+      <div class="idea"><div class="idea-num">04</div>Feminine energy isn’t weakness. It’s knowing when to receive and when to lead.</div>
+      <div class="idea"><div class="idea-num">05</div>The best relationships feel like home and growth at the same time.</div>
+      <div class="idea"><div class="idea-num">06</div>Intelligence looks quieter when it’s paired with softness. That’s the combination I trust.</div>
+      <div class="idea"><div class="idea-num">07</div>You can be the founder and still want to be held. Both can be true.</div>
+      <div class="idea"><div class="idea-num">08</div>Protect your peace the same way you protect your brand. Both are assets.</div>
+      <div class="idea"><div class="idea-num">09</div>A soft “no” is still a boundary. And boundaries keep love clean.</div>
+      <div class="idea"><div class="idea-num">10</div>I’m not trying to be the loudest in the room. I’m trying to be the most at ease in my own life.</div>
+    </div>
+
+    <!-- Quick Links + Pipeline -->
+    <div class="card">
+      <h2>Quick Links</h2>
+      <div class="links">
+        <a href="https://www.instagram.com/ceciliaooi_/" target="_blank">@ceciliaooi_</a>
+        <a href="https://www.instagram.com/bashclothing.co/" target="_blank">@bashclothing.co</a>
+        <a href="https://www.bashclothing.co/" target="_blank">Bash Website</a>
+        <a href="https://www.moomoo.com/" target="_blank">moomoo</a>
+        <a href="https://www.threads.net/" target="_blank">Threads</a>
+      </div>
+      <div style="margin-top: 22px;">
+        <h2 style="margin-bottom: 10px;">Work Pipeline</h2>
+        <div class="pipeline-item"><span>Thursday drop content</span><span class="status">In progress</span></div>
+        <div class="pipeline-item"><span>Brand collab content</span><span class="status">Waiting</span></div>
+        <div class="pipeline-item"><span>PR outreach this week</span><span class="status">To do</span></div>
+      </div>
+    </div>
+
+    <!-- Threads -->
+    <div class="card">
+      <h2>Threads at a Glance</h2>
+      <div style="padding: 8px 0; border-bottom: 1px solid var(--border);">
+        <strong>Soft + real</strong><br>
+        <span style="color:var(--muted);font-size:0.9rem;">Honest founder reflections and relationship takes travel further than polished tips.</span>
+      </div>
+      <div style="padding: 8px 0; border-bottom: 1px solid var(--border);">
+        <strong>Quiet confidence</strong><br>
+        <span style="color:var(--muted);font-size:0.9rem;">Short, calm statements land better than hype.</span>
+      </div>
+      <div style="padding: 8px 0;">
+        <strong>Community conversations</strong><br>
+        <span style="color:var(--muted);font-size:0.9rem;">Topic communities are growing — good for gentle relationship + founder chats.</span>
+      </div>
+      <p class="note">Ask me for a fresh Threads scan anytime.</p>
+    </div>
+
+  </div>
+
+  <script>
+    document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-MY', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const listEl = document.getElementById('socialList');
+    let plans = JSON.parse(localStorage.getItem('ceciliaPlans') || '[]');
+
+    function renderPlans() {
+      listEl.innerHTML = '';
+      if (plans.length === 0) {
+        listEl.innerHTML = '<li style="color:var(--muted)">No plans yet — add one below</li>';
+        return;
+      }
+      plans.forEach((p, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${p}</span><button style="background:transparent;color:var(--muted);padding:0;font-size:0.8rem;" onclick="removePlan(${i})">remove</button>`;
+        listEl.appendChild(li);
+      });
+    }
+
+    function addPlan() {
+      const input = document.getElementById('planInput');
+      const val = input.value.trim();
+      if (!val) return;
+      plans.push(val);
+      localStorage.setItem('ceciliaPlans', JSON.stringify(plans));
+      input.value = '';
+      renderPlans();
+    }
+
+    function removePlan(i) {
+      plans.splice(i, 1);
+      localStorage.setItem('ceciliaPlans', JSON.stringify(plans));
+      renderPlans();
+    }
+
+    function downloadICS() {
+      if (plans.length === 0) {
+        alert('Add at least one plan first');
+        return;
+      }
+      let ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Cecilia Dashboard//EN\r\nCALSCALE:GREGORIAN\r\n';
+      const now = new Date();
+      plans.forEach((p, idx) => {
+        // Simple: create all-day events starting tomorrow + idx days (user can edit on phone)
+        const d = new Date(now);
+        d.setDate(d.getDate() + 1 + idx);
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,'0');
+        const day = String(d.getDate()).padStart(2,'0');
+        const dateStr = `${y}${m}${day}`;
+        ics += `BEGIN:VEVENT\r\nUID:cecilia-plan-${idx}-${Date.now()}@dashboard\r\nDTSTAMP:${dateStr}T000000Z\r\nDTSTART;VALUE=DATE:${dateStr}\r\nSUMMARY:${p.replace(/\n/g,' ')}\r\nEND:VEVENT\r\n`;
+      });
+      ics += 'END:VCALENDAR';
+      const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'cecilia-social-plans.ics';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('planInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') addPlan();
+    });
+
+    renderPlans();
+  </script>
+</body>
+</html>
